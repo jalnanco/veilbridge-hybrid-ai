@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VeilBridge — Zero-Leak On-Device PII Airlock &amp; Hybrid Document Analyst | Firebase AI Logic</title>
+  <script type="module" crossorigin src="./assets/index-WCtJQwhu.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DBQM99Zn.css">
+</head>
+<body>
+  <!-- Top Command & Hybrid Readiness Header -->
+  <header class="vb-topbar">
+    <div class="vb-brand">
+      <div class="vb-logo">VB</div>
+      <div>
+        <div class="vb-title">
+          VeilBridge
+          <span class="vb-chip">Firebase AI Logic v13.4 · Hybrid SDK</span>
+        </div>
+        <div class="vb-subtitle">Zero-Leak On-Device PII Airlock (Gemini Nano 4) + Cloud Deep Redline Studio (Gemini 3.8 Flash)</div>
+      </div>
+    </div>
+
+    <div class="vb-presets" role="group" aria-label="Synthetic Sample Scenarios">
+      <button class="vb-preset-btn active" data-preset="freelance_contract" id="btn-preset-contract">
+        1. Freelance IP-Trap Contract
+      </button>
+      <button class="vb-preset-btn" data-preset="hospital_bill" id="btn-preset-bill">
+        2. Hospital Bill (Multimodal PNG)
+      </button>
+      <button class="vb-preset-btn" data-preset="prod_crash_log" id="btn-preset-log">
+        3. Prod Crash Log with Secrets
+      </button>
+    </div>
+
+    <div class="vb-actions">
+      <button class="vb-btn vb-btn-offline" id="btn-offline-toggle" title="Simulate Airplane/Offline Mode to prove 100% On-Device Resilience">
+        ✈ Offline Mode: OFF
+      </button>
+      <button class="vb-btn vb-btn-nano" id="btn-warmup-nano" title="Call triageModel.initializeDeviceModel() on user gesture">
+        ⚡ Initialize Nano 4
+      </button>
+      <button class="vb-btn" id="btn-firebase-modal" title="Connect Live Firebase Project Configuration (Optional)">
+        ⚙ Firebase Config
+      </button>
+    </div>
+  </header>
+
+  <!-- Live Hybrid Telemetry HUD Strip -->
+  <nav class="vb-subbar">
+    <div class="vb-tabs" role="tablist">
+      <button class="vb-tab active" data-view="airlock" id="tab-airlock">
+        01 · Privacy Airlock &amp; Clause Triage
+      </button>
+      <button class="vb-tab" data-view="studio" id="tab-studio">
+        02 · Deep Redline &amp; Local Re-Hydration
+      </button>
+      <button class="vb-tab" data-view="telemetry" id="tab-telemetry">
+        03 · Hybrid Routing &amp; Cost Telemetry
+      </button>
+      <button class="vb-tab" data-view="arch" id="tab-arch">
+        04 · Architecture &amp; firebase/ai SDK
+      </button>
+    </div>
+
+    <div class="vb-hud">
+      <span class="hud-pill hud-green" id="hud-leak-badge">🔒 Raw PII Sent to Cloud: 0 Bytes</span>
+      <span class="hud-pill hud-violet" id="hud-vault-badge">Vaulted Locally: 7 Entities</span>
+      <span class="hud-pill hud-cyan" id="hud-source-badge">inferenceSource: HYBRID READY</span>
+      <span class="hud-pill" id="hud-nano-badge">Chrome Nano 4: Probing...</span>
+    </div>
+  </nav>
+
+  <!-- Main 1920x1080 Workbench Canvas -->
+  <main class="vb-main">
+    <!-- ==================== VIEW 1: 3-COLUMN PRIVACY AIRLOCK & TRIAGE ==================== -->
+    <section class="vb-view active" id="view-airlock">
+      <!-- Column 1: Private Input + Multimodal Image + Local Vault -->
+      <div class="vb-col">
+        <div class="vb-card" style="flex: 1.15;">
+          <div class="vb-card-head">
+            <span class="vb-card-title">1 · Private Input Zone (Never Leaves Browser)</span>
+            <span class="mode-tag mode-local">ONLY_ON_DEVICE</span>
+          </div>
+          <div class="vb-card-body" style="display: flex; flex-direction: column; gap: 8px;">
+            <p class="vb-desc" id="active-preset-desc"></p>
+            <textarea class="vb-textarea" id="raw-input-area" spellcheck="false"></textarea>
+            <div class="vb-dropzone" id="multimodal-bar">
+              <div id="image-preview-wrap" style="display: none;">
+                <img id="receipt-preview-img" alt="Multimodal Invoice Preview" />
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; color: var(--text-muted);" id="image-status-label">
+                  Optional PNG/JPEG multimodal input via <code>fileToGenerativePart()</code>
+                </span>
+                <label class="vb-btn" style="padding: 3px 9px; font-size: 11px;">
+                  + Attach PNG/JPEG
+                  <input type="file" id="image-file-input" accept="image/png,image/jpeg" hidden />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vb-card" style="flex: 0.85;">
+          <div class="vb-card-head">
+            <span class="vb-card-title">Local Reversible PII Vault (Click to Toggle)</span>
+            <span style="font-family: var(--font-mono); font-size: 10.5px; color: #a7f3d0;" id="vault-count-label">7 Locked</span>
+          </div>
+          <div class="vb-card-body">
+            <div class="vault-grid" id="vault-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 2: Sanitized Twin ("What the Cloud Sees") -->
+      <div class="vb-col">
+        <div class="vb-card" style="flex: 1;">
+          <div class="vb-card-head">
+            <span class="vb-card-title">2 · Sanitized Twin ("What Cloud Gemini Sees")</span>
+            <span class="mode-tag mode-verified" id="zero-leak-pill">✓ 0 RAW PII LEAKS</span>
+          </div>
+          <div class="vb-card-body" style="display: flex; flex-direction: column; gap: 10px;">
+            <div class="airlock-banner" id="airlock-audit-banner"></div>
+            <div class="sanitized-view" id="sanitized-twin-view"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: Stage 2 Instant Clause Co-Pilot (`PREFER_ON_DEVICE`) -->
+      <div class="vb-col">
+        <div class="vb-card" style="flex: 1;">
+          <div class="vb-card-head">
+            <span class="vb-card-title">3 · Instant Risk Triage Co-Pilot</span>
+            <span class="mode-tag mode-hybrid" id="triage-mode-tag">PREFER_ON_DEVICE</span>
+          </div>
+          <div class="vb-card-body" style="display: flex; flex-direction: column; gap: 10px;">
+            <div class="triage-list" id="triage-list"></div>
+            <button class="vb-btn vb-btn-primary" id="btn-jump-studio" style="margin-top: auto; justify-content: center; padding: 9px;">
+              Open Deep Redline &amp; Re-Hydration Studio (Stage 3) →
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: DEEP REDLINE & RE-HYDRATION STUDIO ==================== -->
+    <section class="vb-view" id="view-studio">
+      <div class="vb-col">
+        <div class="vb-card" style="flex: 1;">
+          <div class="vb-card-head">
+            <span class="vb-card-title">Stage 3 · Clause-by-Clause Redline Counter-Proposals</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="mode-tag mode-cloud" id="studio-model-tag">PREFER_IN_CLOUD · gemini-3.8-flash</span>
+            </div>
+          </div>
+          <div class="vb-card-body" style="display: flex; flex-direction: column; gap: 10px;">
+            <div class="studio-summary" id="studio-exec-summary"></div>
+            <div class="redline-list" id="redline-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vb-col">
+        <div class="vb-card" style="flex: 1;">
+          <div class="vb-card-head">
+            <span class="vb-card-title">Local Browser Re-Hydration Proof (Cloud Tokens → Real Values)</span>
+            <button class="vb-btn" id="btn-copy-email" style="padding: 3px 9px; font-size: 11px;">Copy Final Letter</button>
+          </div>
+          <div class="vb-card-body" style="display: grid; grid-template-rows: 1fr 1fr; gap: 10px;">
+            <div style="display: flex; flex-direction: column; min-height: 0;">
+              <div class="pane-kicker" style="color: #c4b5fd;">
+                ☁ Raw Cloud Gemini Output (Contains Placeholder Tokens Only — Zero Real Names/Accounts Known to Cloud)
+              </div>
+              <pre class="studio-pre sanitized-pre" id="email-sanitized-pre"></pre>
+            </div>
+            <div style="display: flex; flex-direction: column; min-height: 0;">
+              <div class="pane-kicker" style="color: #6ee7b7;">
+                🔒 Locally Re-Hydrated Ready-to-Send Letter (Vault Entities Restored Inside Browser Memory)
+              </div>
+              <pre class="studio-pre hydrated-pre" id="email-hydrated-pre"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: HYBRID ROUTING & TELEMETRY ==================== -->
+    <section class="vb-view" id="view-telemetry">
+      <div class="vb-card">
+        <div class="vb-card-head">
+          <span class="vb-card-title">Live 3-Stage Firebase AI Logic Execution Graph &amp; Byte-Level Privacy Boundary</span>
+          <span class="vb-chip" id="route-mode-indicator">Online Hybrid Mode (On-Device Airlock + Cloud Analyst)</span>
+        </div>
+        <div class="vb-card-body" style="background: #080b14; display: flex; align-items: center; padding: 8px 16px;">
+          <svg id="routing-svg" viewBox="0 0 1800 240" style="width: 100%; height: 100%;"></svg>
+        </div>
+      </div>
+
+      <div class="telemetry-bottom-grid">
+        <div class="vb-card">
+          <div class="vb-card-head">
+            <span class="vb-card-title">Per-Stage Inference Execution Log (<code>response.inferenceSource</code>)</span>
+            <span class="mode-tag mode-verified">App Check Enforced</span>
+          </div>
+          <div class="vb-card-body">
+            <table class="tel-table">
+              <thead>
+                <tr>
+                  <th>Stage</th>
+                  <th>Configured SDK Mode</th>
+                  <th>Actual inferenceSource</th>
+                  <th>Active Model</th>
+                  <th>Latency</th>
+                  <th>Cloud Bytes</th>
+                  <th>Tokens Saved</th>
+                </tr>
+              </thead>
+              <tbody id="tel-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="vb-card">
+          <div class="vb-card-head">
+            <span class="vb-card-title">Hybrid vs Cloud-Only Impact Summary</span>
+            <span class="vb-chip">Measured Session Metrics</span>
+          </div>
+          <div class="vb-card-body" id="savings-kpi-box"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: ARCHITECTURE & FIREBASE/AI SDK ==================== -->
+    <section class="vb-view" id="view-arch">
+      <div class="vb-card">
+        <div class="vb-card-head">
+          <span class="vb-card-title">VeilBridge — End-to-End Firebase AI Logic Hybrid Architecture</span>
+          <span class="vb-chip">Firebase App Check · Remote Config · Chrome Gemini Nano 4 · Gemini 3.8 Flash</span>
+        </div>
+        <div class="vb-card-body" style="background: #080b14; display: flex; align-items: center; padding: 8px 16px;">
+          <svg id="arch-diagram-svg" viewBox="0 0 1800 230" style="width: 100%; height: 100%;"></svg>
+        </div>
+      </div>
+
+      <div class="arch-bottom-grid">
+        <div class="vb-card">
+          <div class="vb-card-head">
+            <span class="vb-card-title">Runtime SDK Implementation (<code>src/firebaseHybridClient.ts</code>)</span>
+            <span class="mode-tag mode-hybrid">firebase/ai v13.4.0</span>
+          </div>
+          <pre class="studio-pre" id="sdk-code-showcase"></pre>
+        </div>
+
+        <div class="vb-card">
+          <div class="vb-card-head">
+            <span class="vb-card-title">Why Each InferenceMode Exists in VeilBridge</span>
+            <span class="mode-tag mode-verified">10/10 Unit Tests PASS</span>
+          </div>
+          <div class="vb-card-body" id="mode-rationale-cards"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Optional Live Firebase Project Configuration Modal -->
+  <div class="vb-modal-backdrop" id="firebase-modal" style="display: none;">
+    <div class="vb-modal">
+      <div class="vb-card-head">
+        <span class="vb-card-title">Connect Live Firebase AI Logic Project (Optional BYO Config)</span>
+        <button class="vb-btn" id="btn-close-modal" style="padding: 2px 8px;">✕</button>
+      </div>
+      <div class="vb-card-body" style="display: flex; flex-direction: column; gap: 10px;">
+        <p class="vb-desc">
+          VeilBridge works immediately out-of-the-box with zero keys committed to Git. To test live cloud calls against your own Firebase AI Logic project (<code>GoogleAIBackend</code> + <code>App Check</code>), enter your web app configuration below (stored only in session memory):
+        </p>
+        <input class="vb-input" id="cfg-api-key" placeholder="apiKey (e.g. AIza...)" />
+        <input class="vb-input" id="cfg-project-id" placeholder="projectId (e.g. my-hybrid-ai-app)" />
+        <input class="vb-input" id="cfg-app-id" placeholder="appId (e.g. 1:123456:web:abcdef)" />
+        <input class="vb-input" id="cfg-recaptcha" placeholder="Optional reCAPTCHA v3 Site Key for App Check" />
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+          <button class="vb-btn vb-btn-primary" id="btn-save-firebase">Initialize Firebase AI Logic</button>
+        </div>
+        <div id="cfg-status-msg" style="font-size: 11.5px; color: #6ee7b7;"></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
