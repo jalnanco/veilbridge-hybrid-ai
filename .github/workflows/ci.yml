@@ -13,8 +13,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: "npm"
-      - run: npm ci
+      - run: npm install
       - name: Run 10 TypeScript Unit & Firebase AI Logic SDK Tests
         run: npm test
       - name: TypeScript Strict Check & Vite Production Build
